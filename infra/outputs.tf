@@ -85,6 +85,20 @@ output "search_index_name" {
   value       = "todos"
 }
 
+output "search_service_name" {
+  description = "Free Azure AI Search service name for quota, role and health diagnostics."
+  value       = azurerm_search_service.app.name
+}
+
+output "sql_compute_configuration" {
+  description = "Actual SQL serverless compute settings; -1 confirms auto-pause is disabled."
+  value = {
+    sku_name                    = azurerm_mssql_database.app.sku_name
+    min_vcores                  = azurerm_mssql_database.app.min_capacity
+    auto_pause_delay_in_minutes = azurerm_mssql_database.app.auto_pause_delay_in_minutes
+  }
+}
+
 output "sql_database_name" {
   description = "Database initialized by the deployment script."
   value       = azurerm_mssql_database.app.name
