@@ -27,6 +27,8 @@ namespace DotNetCoreSqlDb.Controllers
 
         public IActionResult Support() => View();
 
+        public IActionResult DisplayOptions() => View();
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

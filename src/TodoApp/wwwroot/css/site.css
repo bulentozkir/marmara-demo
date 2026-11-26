@@ -345,6 +345,11 @@ a:not(.button):not(.brand) { color: #173c91; text-decoration: underline; text-un
 .reading-controls { display: flex; flex-wrap: wrap; gap: .65rem; }
 .reading-controls .button { flex: 1 1 auto; min-inline-size: 0; }
 .reading-status { flex-basis: 100%; color: #24334d; }
+.display-options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1.5rem; }
+.display-options-panel { padding: 1.5rem; }
+.display-options-panel .reading-controls { margin-block: 1.5rem; }
+.display-options-panel .reading-status { margin-block: 1.5rem; }
+.character-preview { font-size: 2rem; font-weight: 700; letter-spacing: .12em; overflow-wrap: anywhere; }
 
 html[data-contrast="high"] { --ink: #000; --muted: #000; --primary: #000; --primary-hover: #222; --canvas: #fff; --line: #333; }
 html[data-contrast="high"] :is(body, .site-header, .panel, .workspace-hero, .task-count, .icon-tile, .reading-toolbar, .count-pill, .security-badge, .help-callout, .support-art, .story-preview, .todo-item, .status-banner, .form-control, .empty-illustration, .empty-paper) { background: #fff; color: #000; box-shadow: none; border-color: #333; }
@@ -361,5 +366,5 @@ html[data-contrast="high"] .input-validation-error { border: 4px double #000; }
   .reading-controls { width: 100%; }
   .header-inner { gap: 1rem; }
   .auth-story h1 { font-size: 2rem; }
-  .capture-panel, .list-panel, .auth-panel, .settings-panel { padding: 1rem; }
+  .capture-panel, .list-panel, .auth-panel, .settings-panel, .display-options-panel { padding: 1rem; }
 }

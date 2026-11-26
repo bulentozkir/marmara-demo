@@ -108,7 +108,7 @@ The [original Microsoft sample](https://github.com/Azure-Samples/msdocs-app-serv
 - Profile supports username changes, password changes, and account deletion. Each requires the current password. Deletion atomically removes only the current account and its Todos.
 - Password changes invalidate other sessions. Authentication cookies are Secure, HttpOnly, SameSite=Lax, and private pages use `no-store`; unsafe form actions require anti-forgery tokens.
 - Help and Support are available from the top menu. Password recovery email is not configured; Support explains how to reach the application administrator without inventing a contact address.
-- Low-vision reading support includes self-hosted **Atkinson Hyperlegible** fonts, **20px default text**, a warm cream/navy palette, stronger contrast, visible keyboard focus, labeled large controls, and a visible Search label. Browser-saved text-size (up to 200%) and high-contrast options store no account data. Font files retain their [SIL Open Font License](src/TodoApp/wwwroot/fonts/atkinson/OFL.txt).
+- Low-vision reading support includes self-hosted **Atkinson Hyperlegible** fonts, **20px default text**, a warm cream/navy palette, stronger contrast, visible keyboard focus, labeled large controls, and a visible Search label. A dedicated **Display options** page is linked from the top menu; its browser-saved text-size (up to 200%) and high-contrast options apply across the app and store no account data. Font files retain their [SIL Open Font License](src/TodoApp/wwwroot/fonts/atkinson/OFL.txt).
 
 ## Azure AI Search
 

@@ -37,6 +37,7 @@
             <nav class="primary-nav" aria-label="Main navigation">
                 <a class="menu-link @(controller == "Todos" ? "active" : "")" asp-controller="Todos" asp-action="Index" aria-current="@(controller == "Todos" ? "page" : null)">My Todos</a>
                 <a class="menu-link @(action == "Help" ? "active" : "")" asp-controller="Home" asp-action="Help" aria-current="@(action == "Help" ? "page" : null)">Help</a>
+                <a class="menu-link @(action == "DisplayOptions" ? "active" : "")" asp-controller="Home" asp-action="DisplayOptions" aria-current="@(action == "DisplayOptions" ? "page" : null)">Display options</a>
                 <a class="menu-link @(action == "Support" ? "active" : "")" asp-controller="Home" asp-action="Support" aria-current="@(action == "Support" ? "page" : null)">Support</a>
             </nav>
             <div class="account-nav">
@@ -57,18 +58,6 @@
             </div>
         </div>
     </header>
-    <section class="reading-toolbar" aria-label="Display options">
-        <div class="shell reading-toolbar-inner">
-            <strong>Display options</strong>
-            <div class="reading-controls">
-                <button type="button" class="button button-secondary" data-reading-action="decrease">A- Smaller text</button>
-                <button type="button" class="button button-secondary" data-reading-action="increase">A+ Larger text</button>
-                <button type="button" class="button button-secondary" data-reading-action="contrast" aria-pressed="false">High contrast: Off</button>
-                <button type="button" class="button button-quiet" data-reading-action="reset">Reset display</button>
-            </div>
-            <span id="reading-status" class="reading-status" role="status" aria-live="polite"></span>
-        </div>
-    </section>
     <main id="main-content" class="shell page-main" tabindex="-1">
         @if (TempData["StatusMessage"] is string message)
         {

@@ -30,8 +30,23 @@ public class AccountAndTodoTests
             Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
             Assert.Contains("/Account/Login", response.Headers.Location?.ToString());
         }
-        foreach (var path in new[] { "/Home/Help", "/Home/Support", "/Account/Login", "/Account/Register", "/health" })
+        foreach (var path in new[] { "/Home/Help", "/Home/Support", "/Home/DisplayOptions", "/Account/Login", "/Account/Register", "/health" })
             Assert.Equal(HttpStatusCode.OK, (await client.GetAsync(path)).StatusCode);
+    }
+
+    [Fact]
+    public async Task DisplayPreferencesHaveTheirOwnPublicPageAndTopMenuLink()
+    {
+        await using var app = new TodoAppFactory();
+        await app.InitializeDatabaseAsync();
+        using var client = app.NewClient();
+        var login = await client.GetStringAsync("/Account/Login");
+        Assert.Contains("href=\"/Home/DisplayOptions\"", login);
+        Assert.DoesNotContain("data-reading-action=", login);
+        var display = await client.GetStringAsync("/Home/DisplayOptions");
+        Assert.Contains("data-reading-action=\"increase\"", display);
+        Assert.Contains("data-reading-action=\"contrast\"", display);
+        Assert.Contains("aria-live=\"polite\"", display);
     }
 
     [Fact]

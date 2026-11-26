@@ -30,10 +30,6 @@
     document.addEventListener("DOMContentLoaded", () => {
         const controls = document.querySelectorAll("[data-reading-action]");
         const status = document.getElementById("reading-status");
-        if (!status || controls.length === 0) {
-            console.error("The display options controls are missing.");
-            return;
-        }
 
         function update() {
             controls.forEach((button) => {
@@ -44,7 +40,7 @@
                     button.textContent = `High contrast: ${contrast ? "On" : "Off"}`;
                 }
             });
-            status.textContent = `Text size ${Math.round(scale * 100)}%. ${notice}`;
+            if (status) status.textContent = `Text size ${Math.round(scale * 100)}%. ${notice}`;
         }
 
         controls.forEach((button) => {

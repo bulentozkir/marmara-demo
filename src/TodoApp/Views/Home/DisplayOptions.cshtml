@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Display options";
+}
+<header class="page-heading">
+    <span class="eyebrow">YOUR COMFORT COMES FIRST</span>
+    <h1>Make Zava easier to read.</h1>
+    <p>Choose the text size and contrast that work best for you. Changes apply immediately across the app and are saved in this browser.</p>
+</header>
+<div class="display-options-grid">
+    <section class="panel display-options-panel" aria-labelledby="reading-heading">
+        <h2 id="reading-heading">Reading preferences</h2>
+        <p>Increase text up to 200%, choose extra contrast, or return to the larger-text default.</p>
+        <div class="reading-controls">
+            <button type="button" class="button button-secondary" data-reading-action="decrease">A- Smaller text</button>
+            <button type="button" class="button button-secondary" data-reading-action="increase">A+ Larger text</button>
+            <button type="button" class="button button-secondary" data-reading-action="contrast" aria-pressed="false">High contrast: Off</button>
+            <button type="button" class="button button-quiet" data-reading-action="reset">Reset display</button>
+        </div>
+        <p id="reading-status" class="reading-status" role="status" aria-live="polite"></p>
+        <a class="button button-primary" asp-controller="Todos" asp-action="Index">Return to the app</a>
+    </section>
+    <section class="panel display-options-panel" aria-labelledby="preview-heading">
+        <h2 id="preview-heading">A comfortable reading preview.</h2>
+        <p>Zava uses Atkinson Hyperlegible, a font with distinctive letter shapes. Larger text, generous spacing, clear labels and strong contrast help keep the interface readable.</p>
+        <p class="character-preview" aria-label="Character examples: uppercase I, lowercase l, number one; uppercase O, number zero; uppercase B, number eight.">I l 1 &nbsp; O 0 &nbsp; B 8</p>
+        <p>Keyboard tip: press Tab to move between controls. A bold focus outline shows where you are.</p>
+        <a asp-action="Help">Read the help guide</a>
+    </section>
+</div>
