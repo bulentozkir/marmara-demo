@@ -1,5 +1,63 @@
 # marmara-demo
 
+**[Open the Marmara web app](https://marmara-86fc72f2-fjcrcxdgcgfqgxb4.b01.azurefd.net)**
+
+## Architecture
+
+```mermaid
+flowchart TB
+    BROWSER["Browser<br/>Sign in - private Todos - profile"]
+    subgraph AZURE["Azure resource group: rg-marmara"]
+        FD["Azure Front Door Standard<br/>Managed HTTPS - no shared caching"]
+        subgraph IT["Italy North"]
+            subgraph PLAN["Linux App Service plan - B1"]
+                APP["Marmara - ASP.NET Core 10<br/>Identity accounts - Help - Support"]
+            end
+            MI["User-assigned managed identity<br/>No database passwords in the app"]
+            subgraph VNET["Virtual network: 10.42.0.0/16"]
+                INTEGRATION["App integration subnet<br/>10.42.1.0/24"]
+                subgraph PRIVATE["Private endpoint subnet - 10.42.2.0/24"]
+                    SQLPE["SQL private endpoint + NIC"]
+                    KVPE["Key Vault private endpoint + NIC"]
+                end
+            end
+            DNS["Private DNS zones + VNet links<br/>SQL Database and Key Vault"]
+            KV["Key Vault Standard<br/>Private SQL connection reference"]
+        end
+        subgraph FR["France Central"]
+            SQL["Azure SQL logical server + todos database<br/>Entra-only - Serverless 0.5-1 vCore<br/>Auto-pause disabled"]
+            ACCOUNTS[("AspNetUsers<br/>Salted password hashes")]
+            TODOS[("Todos<br/>OwnerId checked on every read and delete")]
+        end
+    end
+    BROWSER ==>|HTTPS + secure session cookie| FD
+    FD ==>|HTTPS - service tag + profile ID restriction| APP
+    APP -->|Private outbound traffic| INTEGRATION
+    INTEGRATION -->|TCP 1433| SQLPE
+    SQLPE -->|Private Link| SQL
+    INTEGRATION -->|HTTPS| KVPE
+    KVPE -->|Private Link| KV
+    APP -.->|Uses| MI
+    MI -.->|SQL reader and writer| SQL
+    MI -.->|Key Vault Secrets User| KV
+    DNS -.->|Private resolution| INTEGRATION
+    DNS -.->|A record| SQLPE
+    DNS -.->|A record| KVPE
+    SQL --> ACCOUNTS
+    SQL --> TODOS
+    ACCOUNTS -->|User ID = Todo owner| TODOS
+    classDef edge fill:#ede9fe,stroke:#8b5cf6,color:#312e81
+    classDef compute fill:#dbeafe,stroke:#3b82f6,color:#1e3a8a
+    classDef data fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    classDef security fill:#dcfce7,stroke:#22c55e,color:#14532d
+    class FD edge
+    class APP,INTEGRATION compute
+    class SQL,ACCOUNTS,TODOS,SQLPE,DNS data
+    class MI,KV,KVPE security
+```
+
+Only Front Door can reach the app origin. SQL and Key Vault have no public access. Browser users authenticate against SQL-backed Identity accounts; the app itself uses managed identity to connect to Azure services.
+
 An authenticated, private Todo app based on the [Microsoft Learn ASP.NET Core + Azure SQL tutorial](https://learn.microsoft.com/en-us/azure/app-service/tutorial-dotnetcore-sqldb-app?tabs=copilot&pivots=azure-portal), deployed with Terraform and published through Azure Front Door Standard.
 
 ## Azure target
