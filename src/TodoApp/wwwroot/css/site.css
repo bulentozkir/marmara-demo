@@ -31,7 +31,6 @@ p { color: var(--muted); }
 .brand { display: flex; align-items: center; gap: 11px; color: var(--ink); font-size: 1.55rem; font-weight: 800; letter-spacing: -.06em; line-height: 1.2; }
 .brand:hover { color: var(--ink); }
 .brand-mark { display: grid; place-items: center; width: 43px; height: 43px; border-radius: 14px; color: white; background: linear-gradient(140deg, #4468e5, #2748ba); box-shadow: 0 5px 13px #3659d923; }
-.brand-mark .icon { width: 29px; height: 29px; stroke-width: 2.4; }
 .brand-caption { display: block; margin-top: 4px; font-size: .65rem; font-weight: 500; letter-spacing: .015em; color: var(--muted); }
 .primary-nav, .account-nav { display: flex; align-items: center; gap: 7px; }
 .account-nav { margin-left: auto; gap: 12px; }

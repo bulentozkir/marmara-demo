@@ -1,6 +1,8 @@
-# marmara-demo
+<p align="center"><img src="src/TodoApp/wwwroot/images/zava-logo.svg" width="72" height="72" alt="Zava logo" /></p>
 
-**[Open the Marmara web app](https://marmara-86fc72f2-fjcrcxdgcgfqgxb4.b01.azurefd.net)**
+# Zava Todo
+
+**[Open the Zava web app](https://marmara-86fc72f2-fjcrcxdgcgfqgxb4.b01.azurefd.net)**
 
 ## Architecture
 
@@ -11,7 +13,7 @@ flowchart TB
         FD["Azure Front Door Standard<br/>Managed HTTPS - no shared caching"]
         subgraph IT["Italy North"]
             subgraph PLAN["Linux App Service plan - B1"]
-                APP["Marmara - ASP.NET Core 10<br/>Identity accounts - Help - Support"]
+                APP["Zava - ASP.NET Core 10<br/>Identity accounts - Help - Support"]
             end
             MI["User-assigned managed identity<br/>No database passwords in the app"]
             subgraph VNET["Virtual network: 10.42.0.0/16"]
@@ -88,7 +90,7 @@ The subscription policy denies SQL-password authentication. This conversion ther
 
 Key Vault's connection string is created through its ARM management-plane API, so the vault never needs temporary public access. Key Vault soft deletion and purge protection are enabled.
 
-The [original Microsoft sample](https://github.com/Azure-Samples/msdocs-app-service-sqldb-dotnetcore/tree/5d6e6bed95984b5f70343988d6485f235302d212) is included in [src/TodoApp](src/TodoApp), with its MIT license preserved. The app adds SQL-backed accounts, per-user Todos, profile management, Help/Support pages, and a responsive Marmara interface. No GitHub login, fork, push, or `azd` is required.
+The [original Microsoft sample](https://github.com/Azure-Samples/msdocs-app-service-sqldb-dotnetcore/tree/5d6e6bed95984b5f70343988d6485f235302d212) is included in [src/TodoApp](src/TodoApp), with its MIT license preserved. The app adds SQL-backed accounts, per-user Todos, profile management, Help/Support pages, and a responsive Zava interface. Zava is a fictional demo brand; the original SVG logo was created for this sample. Existing `marmara-demo` infrastructure names are retained. No GitHub login, fork, push, or `azd` is required.
 
 ## Accounts and privacy
 

@@ -8,7 +8,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#17253f" />
-    <title>@ViewData["Title"] - Marmara</title>
+    <title>@ViewData["Title"] - Zava</title>
+    <meta name="description" content="Zava is a calm, private workspace for your everyday Todos." />
+    <link rel="icon" type="image/svg+xml" href="~/images/zava-logo.svg" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
@@ -26,9 +28,9 @@
     </svg>
     <header class="site-header">
         <div class="shell header-inner">
-            <a class="brand" asp-controller="Todos" asp-action="Index" aria-label="Marmara home">
-                <span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#icon-check" /></svg></span>
-                <span>marmara<span class="brand-caption">A little more focus.</span></span>
+            <a class="brand" asp-controller="Todos" asp-action="Index" aria-label="Zava home">
+                <img class="brand-mark" src="~/images/zava-logo.svg" alt="" width="43" height="43" asp-append-version="true" />
+                <span>Zava<span class="brand-caption">A little more focus.</span></span>
             </a>
             <nav class="primary-nav" aria-label="Main navigation">
                 <a class="menu-link @(controller == "Todos" ? "active" : "")" asp-controller="Todos" asp-action="Index" aria-current="@(controller == "Todos" ? "page" : null)">My Todos</a>
@@ -63,8 +65,8 @@
         @RenderBody()
     </main>
     <footer class="shell site-footer">
-        <span><strong>marmara</strong> &mdash; less noise, more clarity.</span>
-        <span>Made for your everyday. <a asp-controller="Home" asp-action="Help">Need a hand?</a></span>
+        <span><strong>Zava</strong> &mdash; less noise, more clarity.</span>
+        <span>A fictional demo brand. <a asp-controller="Home" asp-action="Help">Need a hand?</a></span>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

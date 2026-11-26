@@ -45,7 +45,7 @@ try {
             'tool', 'run', 'dotnet-ef', '--', 'migrations', 'bundle',
             '--project', $project, '--startup-project', $project,
             '--configuration', 'Release', '--runtime', 'linux-x64',
-            '--self-contained', '--output', (Join-Path $source 'migrationsbundle')
+            '--self-contained', '--force', '--output', (Join-Path $source 'migrationsbundle')
         )
         Invoke-Checked 'dotnet' @(
             'publish', $project, '--configuration', 'Release',
