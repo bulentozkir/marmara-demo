@@ -167,7 +167,8 @@ p { color: var(--muted); }
 .profile-help p { margin-bottom: 5px; }
 .profile-help a { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; }
 .profile-help .icon { width: 15px; height: 15px; }
-.settings-stack { display: grid; gap: 23px; }
+.settings-stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 23px; min-width: 0; }
+.settings-panel, .settings-heading > div, .confirmation-field > label { min-width: 0; overflow-wrap: anywhere; }
 .settings-panel { padding: 30px; }
 .settings-heading { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
 .settings-heading h2 { margin-bottom: 5px; }
@@ -330,6 +331,12 @@ a:not(.button):not(.brand) { color: #173c91; text-decoration: underline; text-un
 .guide-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
 .profile-summary { position: static; }
 .workspace-hero { flex-wrap: wrap; }
+.workspace-hero > div { min-width: 0; max-width: 100%; }
+.task-count { min-width: 0; max-width: 100%; }
+.task-count span { white-space: normal; min-width: 0; }
+.privacy-note { max-width: 100%; white-space: normal; }
+.section-heading > div { min-width: 0; overflow-wrap: anywhere; }
+.count-pill { flex-shrink: 0; }
 .task-count strong { color: #233a66; }
 .auth-panel h2 { font-size: 1.6rem; }
 .guide-card h2, .settings-panel h2 { font-size: 1.4rem; }
@@ -363,6 +370,7 @@ html[data-contrast="high"] .input-validation-error { border: 4px double #000; }
 
 @media (max-width: 480px) {
   .search-field-group { flex-basis: 100%; }
+  .workspace-hero > div:first-child { width: 100%; }
   .reading-controls { width: 100%; }
   .header-inner { gap: 1rem; }
   .auth-story h1 { font-size: 2rem; }
