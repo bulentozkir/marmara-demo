@@ -6,6 +6,17 @@
 
 ## Architecture
 
+<p align="center">
+  <img src="docs/architecture-topology.drawio.svg" alt="Zava Todo Azure solution topology diagram drawn with official Azure icons" width="100%" />
+</p>
+
+<p align="center">
+  <sub>Editable topology diagram: <a href="docs/architecture-topology.drawio.svg"><code>docs/architecture-topology.drawio.svg</code></a> (official Azure icons · open in <a href="https://app.diagrams.net/">draw.io</a> to edit)</sub>
+</p>
+
+<details>
+<summary>Mermaid flow diagram</summary>
+
 ```mermaid
 flowchart TB
     BROWSER["Browser<br/>Sign in - private Todos - profile"]
@@ -62,6 +73,8 @@ flowchart TB
     class SQL,ACCOUNTS,TODOS,OUTBOX,SQLPE,DNS,SEARCH data
     class MI,KV,KVPE security
 ```
+
+</details>
 
 Only Front Door can reach the app origin. SQL and Key Vault have no public access. Browser users authenticate against SQL-backed Identity accounts; the app itself uses managed identity to connect to Azure services.
 
