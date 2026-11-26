@@ -1,0 +1,13 @@
+@{
+    ViewData["Title"] = "Support";
+}
+<header class="page-heading centered"><span class="eyebrow">WE ALL NEED A HAND SOMETIMES</span><h1>Let's get you<br />back on track.</h1><p>A few simple checks can make all the difference.</p></header>
+<div class="guide-grid">
+    <section class="panel guide-card"><span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#icon-user" /></svg></span><h2>Can't sign in?</h2><p>Check your username and password, including capitalization. After five failed attempts, wait five minutes before trying again.</p><a asp-controller="Account" asp-action="Login">Try signing in<svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg></a></section>
+    <section class="panel guide-card"><span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#icon-lock" /></svg></span><h2>Need an account change?</h2><p>Use your profile to change your username or password. If you have forgotten your password, contact your application administrator; self-service password recovery is not configured.</p><a asp-controller="Account" asp-action="Profile">Open my profile<svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg></a></section>
+    <section class="panel guide-card"><span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#icon-book" /></svg></span><h2>Something missing?</h2><p>Make sure you are signed in to the right account. Each account has its own private list. Refresh the page if a recent change is not visible.</p><a asp-action="Help">Browse the help guide<svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg></a></section>
+</div>
+<section class="panel support-note">
+    <div><span class="eyebrow">WHEN YOU NEED A LITTLE MORE HELP</span><h2>Reach your application administrator.</h2><p>If a problem continues, share when it happened, the page you were using, and the steps that led to it. If an error page shows a request ID, include that too.</p><div class="safety-note"><svg class="icon" aria-hidden="true"><use href="#icon-lock" /></svg>Never send your password or private Todo contents in a support request.</div></div>
+    <span class="support-art" aria-hidden="true"><svg class="icon"><use href="#icon-life" /></svg></span>
+</section>

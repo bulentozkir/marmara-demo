@@ -1,0 +1,47 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Your profile";
+}
+<header class="page-heading"><span class="eyebrow">MAKE IT YOURS</span><h1>Your space, your settings.</h1><p>Keep your account up to date and your peace of mind intact.</p></header>
+<div class="profile-grid">
+    <aside class="panel profile-summary">
+        <div class="avatar" aria-hidden="true">@Model.Account.Username[..1].ToUpperInvariant()</div>
+        <h2>@Model.Account.Username</h2><p class="muted">Your personal Marmara account</p>
+        <span class="security-badge"><svg class="icon" aria-hidden="true"><use href="#icon-lock" /></svg>Your Todos are private</span>
+        <div class="profile-help"><p>A little extra guidance?</p><a asp-controller="Home" asp-action="Help">Visit the help center<svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg></a></div>
+    </aside>
+    <div class="settings-stack">
+        <div asp-validation-summary="ModelOnly" class="validation-summary" role="alert"></div>
+        <section class="panel settings-panel" aria-labelledby="account-heading">
+            <div class="settings-heading"><span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#icon-user" /></svg></span><div><h2 id="account-heading">Account details</h2><p class="muted">A name that feels like you.</p></div></div>
+            <form asp-action="UpdateProfile" method="post">
+                <div class="field-group"><label asp-for="Account.Username" class="field-label"></label><input asp-for="Account.Username" class="form-control" autocomplete="username" /><span asp-validation-for="Account.Username" class="field-error"></span></div>
+                <div class="field-group"><label asp-for="Account.CurrentPassword" class="field-label"></label><input asp-for="Account.CurrentPassword" class="form-control" autocomplete="current-password" placeholder="Confirm it's you" /><span asp-validation-for="Account.CurrentPassword" class="field-error"></span></div>
+                <button type="submit" class="button button-primary">Save account details</button>
+            </form>
+        </section>
+        <section class="panel settings-panel" aria-labelledby="password-heading">
+            <div class="settings-heading"><span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#icon-lock" /></svg></span><div><h2 id="password-heading">Change password</h2><p class="muted">A little refresh for your account security.</p></div></div>
+            <form asp-action="ChangePassword" method="post">
+                <div class="field-group"><label asp-for="Password.CurrentPassword" class="field-label"></label><input asp-for="Password.CurrentPassword" class="form-control" autocomplete="current-password" /><span asp-validation-for="Password.CurrentPassword" class="field-error"></span></div>
+                <div class="field-group"><label asp-for="Password.NewPassword" class="field-label"></label><div class="password-field"><input asp-for="Password.NewPassword" class="form-control" autocomplete="new-password" aria-describedby="new-password-guidance" /><button type="button" class="password-toggle" data-password-toggle="Password_NewPassword" aria-pressed="false" aria-label="Show new password">Show</button></div><small id="new-password-guidance" class="field-hint">Use 12+ characters, uppercase, lowercase, a number, and a symbol.</small><span asp-validation-for="Password.NewPassword" class="field-error"></span></div>
+                <div class="field-group"><label asp-for="Password.ConfirmPassword" class="field-label"></label><input asp-for="Password.ConfirmPassword" class="form-control" autocomplete="new-password" /><span asp-validation-for="Password.ConfirmPassword" class="field-error"></span></div>
+                <button type="submit" class="button button-primary">Update password</button>
+                <p class="field-hint">Other signed-in sessions will be signed out when you change your password.</p>
+            </form>
+        </section>
+        <section class="panel settings-panel danger-panel" aria-labelledby="delete-heading">
+            <h2 id="delete-heading">Ready to leave?</h2><p class="muted">Deleting your account permanently removes your Todos and account details. This cannot be undone.</p>
+            <details class="delete-details" open="@(ViewData.ModelState.Keys.Any(key => key.StartsWith("Deletion.", StringComparison.Ordinal)))"><summary>Delete my account</summary>
+                <form asp-action="DeleteAccount" method="post">
+                    <div class="field-group"><label asp-for="Deletion.CurrentPassword" class="field-label"></label><input asp-for="Deletion.CurrentPassword" class="form-control" autocomplete="current-password" /><span asp-validation-for="Deletion.CurrentPassword" class="field-error"></span></div>
+                    <div class="confirmation-field"><input asp-for="Deletion.ConfirmDeletion" class="form-check-input" /><label asp-for="Deletion.ConfirmDeletion"></label></div><span asp-validation-for="Deletion.ConfirmDeletion" class="field-error"></span>
+                    <button type="submit" class="button button-danger">Permanently delete my account</button>
+                </form>
+            </details>
+        </section>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

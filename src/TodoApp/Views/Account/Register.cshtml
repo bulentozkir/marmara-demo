@@ -1,0 +1,34 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Create an account";
+}
+<div class="auth-shell">
+    <aside class="auth-story">
+        <span class="eyebrow">A FRESH PAGE, JUST FOR YOU</span>
+        <h1>Small plans.<br />Big possibilities.</h1>
+        <p>Start with one thing. Build a little momentum. Keep your everyday organized, without the overwhelm.</p>
+        <ul class="story-benefits"><li><svg class="icon" aria-hidden="true"><use href="#icon-check" /></svg>Your own private Todo list</li><li><svg class="icon" aria-hidden="true"><use href="#icon-check" /></svg>A simple space that stays in sync</li><li><svg class="icon" aria-hidden="true"><use href="#icon-check" /></svg>You stay in control of your account</li></ul>
+    </aside>
+    <section class="panel auth-panel" aria-labelledby="register-heading">
+        <span class="eyebrow">LET'S MAKE SOME SPACE</span>
+        <h2 id="register-heading">Make yourself at home.</h2>
+        <p class="muted">Create an account and make the list yours.</p>
+        <form asp-action="Register" method="post">
+            <input asp-for="ReturnUrl" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="validation-summary" role="alert"></div>
+            <div class="field-group"><label asp-for="Username" class="field-label"></label><input asp-for="Username" class="form-control" autocomplete="username" placeholder="Choose a username" autofocus /><span asp-validation-for="Username" class="field-error"></span></div>
+            <div class="field-group">
+                <label asp-for="Password" class="field-label"></label>
+                <div class="password-field"><input asp-for="Password" class="form-control" autocomplete="new-password" aria-describedby="password-guidance" placeholder="Create a strong password" /><button type="button" class="password-toggle" data-password-toggle="Password" aria-pressed="false" aria-label="Show password">Show</button></div>
+                <small id="password-guidance" class="field-hint">At least 12 characters, with uppercase, lowercase, a number, and a symbol.</small>
+                <span asp-validation-for="Password" class="field-error"></span>
+            </div>
+            <div class="field-group"><label asp-for="ConfirmPassword" class="field-label"></label><input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="One more time" /><span asp-validation-for="ConfirmPassword" class="field-error"></span></div>
+            <button type="submit" class="button button-primary button-full">Create my account<svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg></button>
+        </form>
+        <p class="auth-switch">Already have an account? <a asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl">Sign in instead</a></p>
+    </section>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

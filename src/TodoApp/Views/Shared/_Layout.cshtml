@@ -1,0 +1,74 @@
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#17253f" />
+    <title>@ViewData["Title"] - Marmara</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <svg class="svg-definitions" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <symbol id="icon-check" viewBox="0 0 24 24"><path d="m6 12 4 4 8-8" /></symbol>
+        <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+        <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7" /></symbol>
+        <symbol id="icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21v-2a8 8 0 0 1 16 0v2" /></symbol>
+        <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6" /></symbol>
+        <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="3" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" /></symbol>
+        <symbol id="icon-book" viewBox="0 0 24 24"><path d="M12 5v16M3 3l9 2 9-2v16l-9 2-9-2z" /></symbol>
+        <symbol id="icon-life" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="4" /><path d="m5.6 5.6 3.6 3.6m5.6 5.6 3.6 3.6m0-12.8-3.6 3.6m-5.6 5.6-3.6 3.6" /></symbol>
+    </svg>
+    <header class="site-header">
+        <div class="shell header-inner">
+            <a class="brand" asp-controller="Todos" asp-action="Index" aria-label="Marmara home">
+                <span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#icon-check" /></svg></span>
+                <span>marmara<span class="brand-caption">A little more focus.</span></span>
+            </a>
+            <nav class="primary-nav" aria-label="Main navigation">
+                <a class="menu-link @(controller == "Todos" ? "active" : "")" asp-controller="Todos" asp-action="Index" aria-current="@(controller == "Todos" ? "page" : null)">My Todos</a>
+                <a class="menu-link @(action == "Help" ? "active" : "")" asp-controller="Home" asp-action="Help" aria-current="@(action == "Help" ? "page" : null)">Help</a>
+                <a class="menu-link @(action == "Support" ? "active" : "")" asp-controller="Home" asp-action="Support" aria-current="@(action == "Support" ? "page" : null)">Support</a>
+            </nav>
+            <div class="account-nav">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a class="profile-link @(action == "Profile" ? "active" : "")" asp-controller="Account" asp-action="Profile">
+                        <svg class="icon" aria-hidden="true"><use href="#icon-user" /></svg><span>Profile</span>
+                    </a>
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        <button class="button button-quiet button-small" type="submit">Sign out</button>
+                    </form>
+                }
+                else
+                {
+                    <a class="menu-link" asp-controller="Account" asp-action="Login">Sign in</a>
+                    <a class="button button-primary button-small" asp-controller="Account" asp-action="Register">Get started</a>
+                }
+            </div>
+        </div>
+    </header>
+    <main id="main-content" class="shell page-main">
+        @if (TempData["StatusMessage"] is string message)
+        {
+            <div class="status-banner" role="status">
+                <svg class="icon" aria-hidden="true"><use href="#icon-check" /></svg>@message
+            </div>
+        }
+        @RenderBody()
+    </main>
+    <footer class="shell site-footer">
+        <span><strong>marmara</strong> &mdash; less noise, more clarity.</span>
+        <span>Made for your everyday. <a asp-controller="Home" asp-action="Help">Need a hand?</a></span>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

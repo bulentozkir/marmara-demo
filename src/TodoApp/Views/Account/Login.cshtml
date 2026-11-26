@@ -1,0 +1,38 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Sign in";
+}
+<div class="auth-shell">
+    <aside class="auth-story">
+        <span class="eyebrow">MORE SPACE FOR WHAT MATTERS</span>
+        <h1>Your day.<br />A little clearer.</h1>
+        <p>A calm place for your plans, ideas, and everyday to-dos. Pick up right where you left off.</p>
+        <div class="story-preview" aria-hidden="true"><span class="preview-dot"></span><span>One small step, then the next.</span><svg class="icon"><use href="#icon-check" /></svg></div>
+        <span class="privacy-note"><svg class="icon" aria-hidden="true"><use href="#icon-lock" /></svg>Personal by design. Private to you.</span>
+    </aside>
+    <section class="panel auth-panel" aria-labelledby="signin-heading">
+        <span class="eyebrow">GOOD TO SEE YOU AGAIN</span>
+        <h2 id="signin-heading">Welcome back.</h2>
+        <p class="muted">Sign in to your own little corner of clarity.</p>
+        <form asp-action="Login" method="post">
+            <input asp-for="ReturnUrl" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="validation-summary" role="alert"></div>
+            <div class="field-group">
+                <label asp-for="Username" class="field-label"></label>
+                <input asp-for="Username" class="form-control" autocomplete="username" autofocus placeholder="Your username" />
+                <span asp-validation-for="Username" class="field-error"></span>
+            </div>
+            <div class="field-group">
+                <label asp-for="Password" class="field-label"></label>
+                <div class="password-field"><input asp-for="Password" class="form-control" autocomplete="current-password" placeholder="Your password" /><button type="button" class="password-toggle" data-password-toggle="Password" aria-pressed="false" aria-label="Show password">Show</button></div>
+                <span asp-validation-for="Password" class="field-error"></span>
+            </div>
+            <button type="submit" class="button button-primary button-full">Sign in<svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg></button>
+        </form>
+        <p class="auth-switch">New here? <a asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl">Create an account</a></p>
+        <a class="subtle-link" asp-controller="Home" asp-action="Support">Having trouble signing in?</a>
+    </section>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,61 @@
+@model TodosIndexViewModel
+@{
+    ViewData["Title"] = "My Todos";
+}
+<section class="workspace-hero">
+    <div>
+        <span class="eyebrow">YOUR PERSONAL WORKSPACE</span>
+        <h1>A clear mind starts here.</h1>
+        <p>Capture the little things. Make space for the big ones.</p>
+        <span class="privacy-note"><svg class="icon" aria-hidden="true"><use href="#icon-lock" /></svg>Only you can see your Todos.</span>
+    </div>
+    <div class="task-count"><strong>@Model.Todos.Count</strong><span>@(Model.Todos.Count == 1 ? "Todo on your list" : "Todos on your list")</span></div>
+</section>
+<div class="workspace-grid">
+    <section class="panel capture-panel" aria-labelledby="capture-heading">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#icon-plus" /></svg></span>
+        <h2 id="capture-heading">One thing at a time.</h2>
+        <p class="muted">An idea, a reminder, your next small win. Start by writing it down.</p>
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="validation-summary" role="alert"></div>
+            <label asp-for="NewTodo.Description" class="field-label"></label>
+            <textarea asp-for="NewTodo.Description" class="form-control todo-input" rows="4" placeholder="e.g. Plan something worth looking forward to" autofocus></textarea>
+            <span asp-validation-for="NewTodo.Description" class="field-error"></span>
+            <button type="submit" class="button button-primary button-full">
+                <svg class="icon" aria-hidden="true"><use href="#icon-plus" /></svg>Add Todo
+            </button>
+        </form>
+        <div class="little-note"><span class="note-dot"></span>No perfect plan needed. Just a place to begin.</div>
+    </section>
+    <section class="panel list-panel" aria-labelledby="todos-heading">
+        <div class="section-heading"><div><span class="eyebrow">A LITTLE PROGRESS, EVERY DAY</span><h2 id="todos-heading">Your list</h2></div><span class="count-pill">@Model.Todos.Count</span></div>
+        @if (Model.Todos.Count > 0)
+        {
+            <ul class="todo-list">
+                @foreach (var todo in Model.Todos)
+                {
+                    <li class="todo-item" id="todo-@todo.ID">
+                        <span class="todo-marker" aria-hidden="true"></span>
+                        <span class="todo-description">@todo.Description</span>
+                        <form asp-action="Delete" asp-route-id="@todo.ID" method="post">
+                            <button type="submit" class="icon-button delete-button" aria-label="Delete Todo: @todo.Description" title="Delete Todo">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-trash" /></svg>
+                            </button>
+                        </form>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-illustration" aria-hidden="true"><div class="empty-paper"><span></span><span></span><span></span></div><span class="empty-check"><svg class="icon"><use href="#icon-check" /></svg></span></div>
+                <h3>A fresh start looks good on you.</h3>
+                <p>Your list is clear. Add your first Todo and take it from there.</p>
+            </div>
+        }
+    </section>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "Help";
+}
+<header class="page-heading centered"><span class="eyebrow">THE MARMARA FIELD GUIDE</span><h1>A little guidance.<br />A lot less guesswork.</h1><p>Everything you need to make this space your own.</p></header>
+<div class="guide-grid">
+    <section class="panel guide-card"><span class="step-number">01</span><h2>Make yourself at home.</h2><p>Create your own account with a username and a strong password. Already here? Sign in to pick up where you left off.</p><a asp-controller="Account" asp-action="Register">Create an account<svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg></a></section>
+    <section class="panel guide-card"><span class="step-number">02</span><h2>Get it out of your head.</h2><p>Write a reminder in the Todo box and select Add Todo. Your list is saved automatically and only visible to your account.</p><a asp-controller="Todos" asp-action="Index">Go to my Todos<svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg></a></section>
+    <section class="panel guide-card"><span class="step-number">03</span><h2>Keep things feeling right.</h2><p>Remove a Todo when you no longer need it. Visit your profile to update your username, change your password, or manage your account.</p><a asp-controller="Account" asp-action="Profile">Manage my profile<svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg></a></section>
+</div>
+<section class="panel faq-panel" aria-labelledby="faq-heading">
+    <span class="eyebrow">GOOD QUESTIONS</span><h2 id="faq-heading">A few things worth knowing.</h2>
+    <details><summary>Who can see my Todos?</summary><p>Only your signed-in account can view or delete your Todos. Other accounts cannot access your list, even if they know a Todo's address or number.</p></details>
+    <details><summary>Will my list still be here when I come back?</summary><p>Yes. Accounts and Todos are stored in the application's SQL database, not just in your browser. Sign back in with the same account to see your list.</p></details>
+    <details><summary>What makes a strong password?</summary><p>Use at least 12 characters, including an uppercase letter, a lowercase letter, a number, and a symbol. Choose something unique to this account. Passwords are stored as salted hashes, never as readable passwords.</p></details>
+    <details><summary>Where did the old shared Todos go?</summary><p>Todos from the earlier anonymous demo are not assigned to a new account. They remain hidden so nobody inherits another person's data.</p></details>
+    <details><summary>How do I change or delete my account?</summary><p>Open Profile while signed in. Your current password is required for account changes. Account deletion permanently removes your own Todos and cannot be undone.</p></details>
+</section>
+<div class="help-callout"><span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#icon-life" /></svg></span><div><h2>Still a little stuck?</h2><p>Let's get you pointed in the right direction.</p></div><a class="button button-secondary" asp-action="Support">Visit support<svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg></a></div>
