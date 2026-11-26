@@ -141,6 +141,8 @@ az login --tenant MngEnvMCAP563244.onmicrosoft.com
 
 The script builds the app and Linux migrations bundle **before** provisioning, validates Terraform, rejects resource deletion/replacement, applies the saved plan, deploys the app, initializes SQL through Front Door, and verifies `/ready`. Initial Front Door propagation can take several minutes.
 
+The migration bundle is built outside the application source and copied once into the deployment package, preventing repeated builds from embedding older bundles and inflating the upload.
+
 Defaults are in [infra/variables.tf](infra/variables.tf); [infra/terraform.tfvars](infra/terraform.tfvars) sets the SQL-only region fallback. The SQL private endpoint remains in the app VNet and supports the cross-region connection without public SQL access. The script checks subscription-specific SQL offer availability before provisioning. Resources receive a stable suffix derived from the subscription, resource group, and prefix. Authentication is scoped per command; the script does not change the Azure CLI's global default subscription.
 
 The SQL server name also includes its region to avoid Azure's name/location reservation left by a failed regional provisioning attempt.

@@ -35,6 +35,7 @@ try {
         $work = Join-Path $repo ".copilot-azure\builds\$([guid]::NewGuid())"
         $source = Join-Path $repo 'src\TodoApp'
         $publish = Join-Path $work 'publish'
+        $bundle = Join-Path $work 'migrationsbundle'
         $PackagePath = Join-Path $work 'app.zip'
         $project = Join-Path $source 'DotNetCoreSqlDb.csproj'
         New-Item -ItemType Directory -Path $work -Force | Out-Null
@@ -45,13 +46,14 @@ try {
             'tool', 'run', 'dotnet-ef', '--', 'migrations', 'bundle',
             '--project', $project, '--startup-project', $project,
             '--configuration', 'Release', '--runtime', 'linux-x64',
-            '--self-contained', '--force', '--output', (Join-Path $source 'migrationsbundle')
+            '--self-contained', '--force', '--output', $bundle
         )
         Invoke-Checked 'dotnet' @(
             'publish', $project, '--configuration', 'Release',
             '--runtime', 'linux-x64', '--self-contained', 'false',
             '--output', $publish
         )
+        Copy-Item -LiteralPath $bundle -Destination (Join-Path $publish 'migrationsbundle')
         Copy-Item -LiteralPath (Join-Path $source 'LICENSE.md') -Destination (Join-Path $publish 'LICENSE.sample.md')
         Copy-Item -LiteralPath (Join-Path $repo 'LICENSE') -Destination $publish
         Compress-Archive -Path (Join-Path $publish '*') -DestinationPath $PackagePath
