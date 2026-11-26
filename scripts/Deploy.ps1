@@ -140,6 +140,11 @@ try {
                 Write-Host 'Azure AI Search schema request timed out.'
             }
             if ($indexResponse) {
+                if ($indexResponse.StatusCode -eq 204) {
+                    $indexResponse = Invoke-WebRequest -Uri $indexUrl `
+                        -Headers @{ Authorization = "Bearer $searchToken" } `
+                        -SkipHttpErrorCheck -TimeoutSec 60
+                }
                 if ($indexResponse.StatusCode -in 200, 201) {
                     $definition = $indexResponse.Content | ConvertFrom-Json
                     if ($definition.name -ne $outputs.search_index_name.value) {
