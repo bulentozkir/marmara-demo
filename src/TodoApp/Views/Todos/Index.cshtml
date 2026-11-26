@@ -1,4 +1,5 @@
 @model TodosIndexViewModel
+@using DotNetCoreSqlDb.Services
 @{
     ViewData["Title"] = "My Todos";
 }
@@ -9,7 +10,7 @@
         <p>Capture the little things. Make space for the big ones.</p>
         <span class="privacy-note"><svg class="icon" aria-hidden="true"><use href="#icon-lock" /></svg>Only you can see your Todos.</span>
     </div>
-    <div class="task-count"><strong>@Model.Todos.Count</strong><span>@(Model.Todos.Count == 1 ? "Todo on your list" : "Todos on your list")</span></div>
+    <div class="task-count"><strong>@Model.TotalTodoCount</strong><span>@(Model.TotalTodoCount == 1 ? "Todo on your list" : "Todos on your list")</span></div>
 </section>
 <div class="workspace-grid">
     <section class="panel capture-panel" aria-labelledby="capture-heading">
@@ -28,7 +29,21 @@
         <div class="little-note"><span class="note-dot"></span>No perfect plan needed. Just a place to begin.</div>
     </section>
     <section class="panel list-panel" aria-labelledby="todos-heading">
-        <div class="section-heading"><div><span class="eyebrow">A LITTLE PROGRESS, EVERY DAY</span><h2 id="todos-heading">Your list</h2></div><span class="count-pill">@Model.Todos.Count</span></div>
+        <div class="section-heading"><div><span class="eyebrow">A LITTLE PROGRESS, EVERY DAY</span><h2 id="todos-heading">@(Model.SearchText.Length == 0 ? "Your list" : "Search results")</h2></div><span class="count-pill">@Model.SearchMatchCount</span></div>
+        <form asp-action="Index" method="get" class="todo-search" role="search">
+            <label for="todo-query" class="visually-hidden">Search your Todos</label>
+            <div class="search-input"><svg class="icon" aria-hidden="true"><use href="#icon-search" /></svg><input id="todo-query" name="q" value="@Model.SearchText" class="form-control" type="search" maxlength="200" placeholder="Find something on your list..." /></div>
+            <button type="submit" class="button button-secondary">Search</button>
+            @if (Model.SearchText.Length > 0)
+            {
+                <a asp-action="Index" class="button button-quiet">Clear</a>
+            }
+        </form>
+        <p class="search-hint">Powered by Azure AI Search. Only your Todos are searched; recent changes may take a few seconds to appear.</p>
+        @if (Model.SearchError is not null)
+        {
+            <div class="status-banner status-warning" role="alert">@Model.SearchError</div>
+        }
         @if (Model.Todos.Count > 0)
         {
             <ul class="todo-list">
@@ -50,9 +65,31 @@
         {
             <div class="empty-state">
                 <div class="empty-illustration" aria-hidden="true"><div class="empty-paper"><span></span><span></span><span></span></div><span class="empty-check"><svg class="icon"><use href="#icon-check" /></svg></span></div>
-                <h3>A fresh start looks good on you.</h3>
-                <p>Your list is clear. Add your first Todo and take it from there.</p>
+                @if (Model.SearchText.Length > 0)
+                {
+                    <h3>@(Model.SearchError is null ? "No matches just yet." : "Your Todos are safe.")</h3>
+                    <p>Try different words, wait a moment for recent changes, or clear the search to see your full list.</p>
+                }
+                else
+                {
+                    <h3>A fresh start looks good on you.</h3>
+                    <p>Your list is clear. Add your first Todo and take it from there.</p>
+                }
             </div>
+        }
+        @if (Model.SearchText.Length > 0 && Model.SearchError is null && (Model.SearchPage > 1 || Model.SearchMatchCount > ITodoSearch.PageSize))
+        {
+            <nav class="search-pagination" aria-label="Search result pages">
+                @if (Model.SearchPage > 1)
+                {
+                    <a class="button button-secondary button-small" asp-action="Index" asp-route-q="@Model.SearchText" asp-route-page="@(Model.SearchPage - 1)">Previous</a>
+                }
+                <span>Page @Model.SearchPage</span>
+                @if ((long)Model.SearchPage * ITodoSearch.PageSize < Model.SearchMatchCount)
+                {
+                    <a class="button button-secondary button-small" asp-action="Index" asp-route-q="@Model.SearchText" asp-route-page="@(Model.SearchPage + 1)">Next</a>
+                }
+            </nav>
         }
     </section>
 </div>

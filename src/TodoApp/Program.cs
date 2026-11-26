@@ -3,6 +3,10 @@ using DotNetCoreSqlDb.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Azure.Core;
+using Azure.Identity;
+using Azure.Search.Documents;
+using DotNetCoreSqlDb.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add database context
@@ -48,6 +52,22 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options =>
     options.ValidationInterval = TimeSpan.Zero);
 builder.Services.AddAntiforgery(options => options.Cookie.SecurePolicy = CookieSecurePolicy.Always);
 builder.Services.AddHealthChecks().AddDbContextCheck<MyDatabaseContext>("sql", tags: ["ready"]);
+builder.Services.AddSingleton<SearchClient>(services =>
+{
+    var configuration = services.GetRequiredService<IConfiguration>();
+    var endpoint = configuration["SEARCH_ENDPOINT"]
+        ?? throw new InvalidOperationException("SEARCH_ENDPOINT is required.");
+    var indexName = configuration["SEARCH_INDEX_NAME"]
+        ?? throw new InvalidOperationException("SEARCH_INDEX_NAME is required.");
+    TokenCredential credential = builder.Environment.IsDevelopment()
+        ? new DefaultAzureCredential()
+        : new ManagedIdentityCredential(ManagedIdentityId.FromUserAssignedClientId(
+            configuration["SQL_APP_CLIENT_ID"]
+                ?? throw new InvalidOperationException("SQL_APP_CLIENT_ID is required.")));
+    return new SearchClient(new Uri(endpoint), indexName, credential);
+});
+builder.Services.AddSingleton<ITodoSearch, AzureTodoSearch>();
+builder.Services.AddHostedService<TodoSearchSyncWorker>();
 
 // Add App Service logging
 builder.Logging.AddAzureWebAppDiagnostics();

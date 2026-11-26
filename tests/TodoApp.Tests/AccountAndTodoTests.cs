@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Azure;
+using DotNetCoreSqlDb.Services;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace TodoApp.Tests;
 
@@ -190,6 +193,79 @@ public class AccountAndTodoTests
         Assert.False(await db.Todo.AnyAsync(todo => todo.Description == "Alice task"));
         Assert.True(await db.Users.AnyAsync(user => user.UserName == "bob"));
         Assert.Contains("Bob task", await bob.GetStringAsync("/"));
+    }
+
+    [Fact]
+    public async Task SearchUsesCurrentOwnerAndRejectsForeignOrDeletedResultsFromTheIndex()
+    {
+        await using var app = new TodoAppFactory();
+        await app.InitializeDatabaseAsync();
+        using var alice = app.NewClient();
+        using var bob = app.NewClient();
+        await Register(alice, "alice");
+        await Register(bob, "bob");
+        await Post(alice, "/", "/Todos/Create", new() { ["NewTodo.Description"] = "Alice searchable" });
+        await Post(bob, "/", "/Todos/Create", new() { ["NewTodo.Description"] = "Bob private" });
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<MyDatabaseContext>();
+        var own = await db.Todo.SingleAsync(todo => todo.Description == "Alice searchable");
+        var foreign = await db.Todo.SingleAsync(todo => todo.Description == "Bob private");
+        var search = app.Services.GetRequiredService<FakeTodoSearch>();
+        search.Result = new([own.SearchDocumentId, foreign.SearchDocumentId], 2);
+
+        var page = await alice.GetStringAsync("/?q=searchable");
+        Assert.Equal(own.OwnerId, search.LastOwnerId);
+        Assert.Contains("Alice searchable", page);
+        Assert.DoesNotContain("Bob private", page);
+        await Post(alice, "/", $"/Todos/Delete/{own.ID}", new());
+        var stale = await alice.GetStringAsync("/?q=searchable");
+        Assert.DoesNotContain("Alice searchable", stale);
+        Assert.DoesNotContain("Bob private", stale);
+    }
+
+    [Fact]
+    public async Task SearchFailureIsExplicitAndDoesNotPretendToReturnSqlSearchResults()
+    {
+        await using var app = new TodoAppFactory();
+        await app.InitializeDatabaseAsync();
+        using var client = app.NewClient();
+        await Register(client, "alice");
+        await Post(client, "/", "/Todos/Create", new() { ["NewTodo.Description"] = "Private result" });
+        app.Services.GetRequiredService<FakeTodoSearch>().Failure = new RequestFailedException(503, "Unavailable");
+        var response = await client.GetAsync("/?q=result");
+        var page = await response.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        Assert.Contains("Search is temporarily unavailable", page);
+        Assert.DoesNotContain("Private result", page);
+    }
+
+    [Fact]
+    public async Task DurableSearchQueueSurvivesFailureAndSynchronizesDeletesFromCurrentSqlState()
+    {
+        await using var app = new TodoAppFactory();
+        await app.InitializeDatabaseAsync();
+        using var client = app.NewClient();
+        await Register(client, "alice");
+        await Post(client, "/", "/Todos/Create", new() { ["NewTodo.Description"] = "Durable search update" });
+        var search = app.Services.GetRequiredService<FakeTodoSearch>();
+        var worker = new TodoSearchSyncWorker(app.Services.GetRequiredService<IServiceScopeFactory>(),
+            search, NullLogger<TodoSearchSyncWorker>.Instance);
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<MyDatabaseContext>();
+        var todo = await db.Todo.SingleAsync();
+        search.Failure = new RequestFailedException(503, "Unavailable");
+        await Assert.ThrowsAsync<RequestFailedException>(() => worker.SynchronizePendingAsync(CancellationToken.None));
+        Assert.Equal(1, await db.SearchOperations.CountAsync());
+
+        search.Failure = null;
+        Assert.Equal(1, await worker.SynchronizePendingAsync(CancellationToken.None));
+        Assert.Equal(todo.SearchDocumentId, Assert.Single(search.AppliedTodos).SearchDocumentId);
+        Assert.Equal(0, await db.SearchOperations.CountAsync());
+        await Post(client, "/", $"/Todos/Delete/{todo.ID}", new());
+        Assert.Equal(1, await worker.SynchronizePendingAsync(CancellationToken.None));
+        Assert.Empty(search.AppliedTodos);
+        Assert.Equal(todo.SearchDocumentId, Assert.Single(search.AppliedIds));
+        Assert.Equal(0, await db.SearchOperations.CountAsync());
     }
 
     [Fact]

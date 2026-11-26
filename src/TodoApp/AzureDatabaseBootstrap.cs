@@ -41,6 +41,10 @@ internal static class AzureDatabaseBootstrap
         }
         await context.Database.MigrateAsync();
         await context.Users.AnyAsync();
+        var ownedTodos = await context.Todo.AsNoTracking().Where(todo => todo.OwnerId != null).ToListAsync();
+        foreach (var todo in ownedTodos)
+            context.QueueSearchUpdate(todo);
+        await context.SaveChangesAsync();
 
         // Service-principal SIDs use the client ID, not the Entra object ID, without a Graph lookup.
         var sid = Convert.ToHexString(Guid.Parse(clientId).ToByteArray());
@@ -73,7 +77,7 @@ internal static class AzureDatabaseBootstrap
             throw new InvalidOperationException("The application SQL identity or database roles were not configured correctly.");
         }
         Console.WriteLine("Database migrations completed; app identity has SQL reader/writer permissions.");
-        return new DatabaseBootstrapResult(true, principalName, reader.GetGuid(0), database, 2);
+        return new DatabaseBootstrapResult(true, principalName, reader.GetGuid(0), database, 3);
     }
 }
 

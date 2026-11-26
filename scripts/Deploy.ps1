@@ -114,6 +114,55 @@ try {
     $app = $outputs.web_app_name.value
     $azureTarget = @('--subscription', $subscription, '--resource-group', $group, '--name', $app)
 
+    $indexReady = $false
+    try {
+        $searchToken = (Invoke-Checked 'az' @(
+            'account', 'get-access-token', '--subscription', $subscription,
+            '--resource', 'https://search.azure.com', '--query', 'accessToken', '--output', 'tsv'
+        )) -join ''
+        if ([string]::IsNullOrWhiteSpace($searchToken)) {
+            throw 'Azure CLI did not return an Azure AI Search access token.'
+        }
+        $schema = Get-Content -Raw -LiteralPath (Join-Path $infra 'todo-search-index.json')
+        $indexUrl = "$($outputs.search_endpoint.value.TrimEnd('/'))/indexes/$($outputs.search_index_name.value)?api-version=2025-09-01"
+        $indexDeadline = [DateTime]::UtcNow.AddMinutes(10)
+        while ([DateTime]::UtcNow -lt $indexDeadline) {
+            $indexResponse = $null
+            try {
+                $indexResponse = Invoke-WebRequest -Uri $indexUrl -Method Put `
+                    -Headers @{ Authorization = "Bearer $searchToken" } -ContentType 'application/json' `
+                    -Body $schema -SkipHttpErrorCheck -TimeoutSec 60
+            }
+            catch [System.Net.Http.HttpRequestException] {
+                Write-Host "Waiting for Azure AI Search endpoint: $($_.Exception.Message)"
+            }
+            catch [System.Threading.Tasks.TaskCanceledException] {
+                Write-Host 'Azure AI Search schema request timed out.'
+            }
+            if ($indexResponse) {
+                if ($indexResponse.StatusCode -in 200, 201) {
+                    $definition = $indexResponse.Content | ConvertFrom-Json
+                    if ($definition.name -ne $outputs.search_index_name.value) {
+                        throw 'Azure AI Search returned an unexpected index definition.'
+                    }
+                    $indexReady = $true
+                    break
+                }
+                if ($indexResponse.StatusCode -notin 401, 403, 404, 429, 503) {
+                    throw "Search index creation failed: HTTP $($indexResponse.StatusCode)."
+                }
+                Write-Host "Waiting for Azure AI Search/RBAC: HTTP $($indexResponse.StatusCode)"
+            }
+            Start-Sleep -Seconds 15
+        }
+    }
+    finally {
+        $searchToken = $null
+    }
+    if (-not $indexReady) {
+        throw 'Azure AI Search index creation did not complete; verify the deployer Search Service Contributor role.'
+    }
+
     Invoke-Checked 'az' (@(
         'webapp', 'deploy', '--type', 'zip', '--src-path', $PackagePath,
         '--restart', 'true', '--track-status', 'false', '--timeout', '600000',
@@ -158,7 +207,7 @@ try {
                     }
                     if ($result.clientId -eq $outputs.managed_identity_client_id.value `
                         -and $result.database -eq $outputs.sql_database_name.value `
-                        -and $result.schemaVersion -eq 2) {
+                        -and $result.schemaVersion -eq 3) {
                         $initialized = $true
                         break
                     }

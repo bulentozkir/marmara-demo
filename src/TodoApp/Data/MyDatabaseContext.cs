@@ -17,10 +17,15 @@ namespace DotNetCoreSqlDb.Data
         }
 
         public DbSet<DotNetCoreSqlDb.Models.Todo> Todo { get; set; } = default!;
+        public DbSet<SearchOperation> SearchOperations { get; set; } = default!;
+
+        public void QueueSearchUpdate(Todo todo) =>
+            SearchOperations.Add(new SearchOperation { DocumentId = todo.SearchDocumentId });
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.Entity<Todo>().HasIndex(todo => todo.SearchDocumentId).IsUnique();
             builder.Entity<Todo>()
                 .HasOne<IdentityUser>()
                 .WithMany()

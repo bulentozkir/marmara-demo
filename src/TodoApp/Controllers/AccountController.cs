@@ -150,7 +150,10 @@ namespace DotNetCoreSqlDb.Controllers
                 return View("Profile", ProfileFor(user));
             }
 
-            _context.Todo.RemoveRange(await _context.Todo.Where(todo => todo.OwnerId == user.Id).ToListAsync());
+            var todos = await _context.Todo.Where(todo => todo.OwnerId == user.Id).ToListAsync();
+            foreach (var todo in todos)
+                _context.QueueSearchUpdate(todo);
+            _context.Todo.RemoveRange(todos);
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             await _signIn.SignOutAsync();

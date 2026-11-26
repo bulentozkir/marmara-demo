@@ -22,6 +22,22 @@ namespace DotNetCoreSqlDb.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("DotNetCoreSqlDb.Models.SearchOperation", b =>
+                {
+                    b.Property<long>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("SearchOperations");
+                });
+
             modelBuilder.Entity("DotNetCoreSqlDb.Models.Todo", b =>
                 {
                     b.Property<int>("ID")
@@ -37,9 +53,15 @@ namespace DotNetCoreSqlDb.Migrations
                     b.Property<string>("OwnerId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<Guid>("SearchDocumentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("ID");
 
                     b.HasIndex("OwnerId");
+
+                    b.HasIndex("SearchDocumentId")
+                        .IsUnique();
 
                     b.ToTable("Todo");
                 });

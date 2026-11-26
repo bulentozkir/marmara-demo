@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using DotNetCoreSqlDb.Services;
 
 namespace TodoApp.Tests;
 
@@ -24,6 +26,14 @@ public sealed class TodoAppFactory : WebApplicationFactory<Program>
             services.RemoveAll<DbContextOptions<MyDatabaseContext>>();
             services.RemoveAll<IDbContextOptionsConfiguration<MyDatabaseContext>>();
             services.AddDbContext<MyDatabaseContext>(options => options.UseSqlite(_connection));
+            services.RemoveAll<ITodoSearch>();
+            services.AddSingleton<FakeTodoSearch>();
+            services.AddSingleton<ITodoSearch>(provider => provider.GetRequiredService<FakeTodoSearch>());
+            var worker = services.SingleOrDefault(descriptor =>
+                descriptor.ServiceType == typeof(IHostedService)
+                && descriptor.ImplementationType == typeof(TodoSearchSyncWorker));
+            if (worker is not null)
+                services.Remove(worker);
         });
     }
 

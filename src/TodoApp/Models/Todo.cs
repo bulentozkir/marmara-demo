@@ -7,5 +7,6 @@
         [System.ComponentModel.DataAnnotations.Display(Name = "What needs to be done?")]
         public string Description { get; set; } = default!;
         public string? OwnerId { get; set; }
+        public Guid SearchDocumentId { get; set; } = Guid.NewGuid();
     }
 }

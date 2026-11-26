@@ -46,6 +46,10 @@ output "resource_group_url" {
 output "resource_ids" {
   description = "Resource IDs managed by this Terraform configuration."
   value = [
+    azurerm_search_service.app.id,
+    azurerm_role_assignment.search_documents.id,
+    azurerm_role_assignment.search_schema_deployer.id,
+    azurerm_role_assignment.search_data_deployer.id,
     azurerm_cdn_frontdoor_profile.app.id,
     azurerm_cdn_frontdoor_endpoint.app.id,
     azurerm_cdn_frontdoor_origin_group.app.id,
@@ -69,6 +73,16 @@ output "resource_ids" {
     azurerm_service_plan.app.id,
     azurerm_linux_web_app.app.id,
   ]
+}
+
+output "search_endpoint" {
+  description = "Free Azure AI Search endpoint, protected by Entra RBAC with API-key authentication disabled."
+  value       = azurerm_search_service.app.endpoint
+}
+
+output "search_index_name" {
+  description = "The single owner-filtered Todo index."
+  value       = "todos"
 }
 
 output "sql_database_name" {

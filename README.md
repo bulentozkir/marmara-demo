@@ -25,11 +25,13 @@ flowchart TB
             end
             DNS["Private DNS zones + VNet links<br/>SQL Database and Key Vault"]
             KV["Key Vault Standard<br/>Private SQL connection reference"]
+            SEARCH["Azure AI Search - Free<br/>50 MB - 10,000 documents - 3 indexes<br/>One Todo index - Entra RBAC only"]
         end
         subgraph FR["France Central"]
             SQL["Azure SQL logical server + todos database<br/>Entra-only - Serverless 0.5-1 vCore<br/>Auto-pause disabled"]
             ACCOUNTS[("AspNetUsers<br/>Salted password hashes")]
             TODOS[("Todos<br/>OwnerId checked on every read and delete")]
+            OUTBOX[("Durable search queue<br/>Atomic with Todo changes")]
         end
     end
     BROWSER ==>|HTTPS + secure session cookie| FD
@@ -42,11 +44,14 @@ flowchart TB
     APP -.->|Uses| MI
     MI -.->|SQL reader and writer| SQL
     MI -.->|Key Vault Secrets User| KV
+    MI -.->|Search Index Data Contributor| SEARCH
+    APP -->|HTTPS - owner-filtered queries and indexing| SEARCH
     DNS -.->|Private resolution| INTEGRATION
     DNS -.->|A record| SQLPE
     DNS -.->|A record| KVPE
     SQL --> ACCOUNTS
     SQL --> TODOS
+    SQL --> OUTBOX
     ACCOUNTS -->|User ID = Todo owner| TODOS
     classDef edge fill:#ede9fe,stroke:#8b5cf6,color:#312e81
     classDef compute fill:#dbeafe,stroke:#3b82f6,color:#1e3a8a
@@ -54,11 +59,13 @@ flowchart TB
     classDef security fill:#dcfce7,stroke:#22c55e,color:#14532d
     class FD edge
     class APP,INTEGRATION compute
-    class SQL,ACCOUNTS,TODOS,SQLPE,DNS data
+    class SQL,ACCOUNTS,TODOS,OUTBOX,SQLPE,DNS,SEARCH data
     class MI,KV,KVPE security
 ```
 
 Only Front Door can reach the app origin. SQL and Key Vault have no public access. Browser users authenticate against SQL-backed Identity accounts; the app itself uses managed identity to connect to Azure services.
+
+The Free Search tier has a public HTTPS endpoint because it does not support private endpoints. Access is protected by Microsoft Entra RBAC, API keys are disabled, and only Todo text and owner identifiers are indexed.
 
 An authenticated, private Todo app based on the [Microsoft Learn ASP.NET Core + Azure SQL tutorial](https://learn.microsoft.com/en-us/azure/app-service/tutorial-dotnetcore-sqldb-app?tabs=copilot&pivots=azure-portal), deployed with Terraform and published through Azure Front Door Standard.
 
@@ -78,6 +85,7 @@ Terraform **references** the existing resource group; it does not own, replace, 
 | --- | --- |
 | Linux App Service | .NET 10, single-instance Basic B1, HTTPS and filesystem logs |
 | Public endpoint | Front Door Standard, managed HTTPS, HTTP-to-HTTPS redirects, no shared caching |
+| Todo search | Azure AI Search Free, one owner-filtered index, managed-identity authentication |
 | SQL server/database | Existing General Purpose serverless SKU, 2 GB, Entra-only authentication |
 | Private networking | VNet, delegated App Service subnet, separate endpoint subnet |
 | Private SQL and Key Vault | Two private endpoints and linked private DNS zones; public access disabled |
@@ -100,6 +108,15 @@ The [original Microsoft sample](https://github.com/Azure-Samples/msdocs-app-serv
 - Profile supports username changes, password changes, and account deletion. Each requires the current password. Deletion atomically removes only the current account and its Todos.
 - Password changes invalidate other sessions. Authentication cookies are Secure, HttpOnly, SameSite=Lax, and private pages use `no-store`; unsafe form actions require anti-forgery tokens.
 - Help and Support are available from the top menu. Password recovery email is not configured; Support explains how to reach the application administrator without inventing a contact address.
+
+## Azure AI Search
+
+- Uses the Free tier: **50 MB, 10,000 hosted documents, and 3 indexes per service**. This app uses one index; capacity is shared across all users, not per account. No paid-tier fallback is automatic.
+- Every query applies an escaped `ownerId` filter from the signed-in account. Matching document IDs are rechecked against SQL ownership before rendering, so stale or foreign index results cannot reveal Todos.
+- Todo creation, deletion and account deletion atomically enqueue durable SQL search operations. A background worker retries indexing and deletes using current SQL state; an outage cannot lose a synchronization request.
+- Search is eventually consistent, typically updating within a few seconds. Errors are explicit rather than silently pretending to perform SQL text search.
+- Password hashes, usernames and account details are **not indexed**. App access uses managed identity and Search Index Data Contributor; the deployer creates the index using an in-memory Entra token.
+- The Free tier has no private endpoint support or production SLA. Its public endpoint is keyless and RBAC-protected. See [Azure AI Search limits](https://learn.microsoft.com/en-us/azure/search/search-limits-quotas-capacity).
 
 ## Front Door publishing
 
@@ -138,11 +155,13 @@ The contained SQL user's SID uses the identity's **application/client ID**, not 
 ```powershell
 dotnet test .\tests\TodoApp.Tests\TodoApp.Tests.csproj --configuration Release
 dotnet tool restore
+$env:SEARCH_ENDPOINT = (terraform -chdir=infra output -raw search_endpoint)
+$env:SEARCH_INDEX_NAME = "todos"
 dotnet ef database update --project .\src\TodoApp
 dotnet run --project .\src\TodoApp --urls https://localhost:7043
 ```
 
-Local development uses Windows SQL LocalDB with integrated authentication; no development database password is committed. Integration tests use an isolated in-memory SQLite database and exercise account management, hashing, anti-forgery, cross-user isolation, and Front Door redirects.
+Local development uses Windows SQL LocalDB and developer Entra credentials for Search; no development database password is committed. Integration tests use isolated SQLite and a mock Search transport to exercise accounts, hashing, anti-forgery, ownership, durable synchronization, escaped filters, and Front Door redirects.
 
 Useful commands:
 

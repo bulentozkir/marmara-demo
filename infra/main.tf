@@ -260,6 +260,8 @@ resource "azurerm_linux_web_app" "app" {
   }
 
   app_settings = {
+    SEARCH_ENDPOINT                     = azurerm_search_service.app.endpoint
+    SEARCH_INDEX_NAME                   = "todos"
     PUBLIC_ORIGIN                       = "https://${azurerm_cdn_frontdoor_endpoint.app.host_name}"
     ASPNETCORE_ENVIRONMENT              = "Production"
     SCM_DO_BUILD_DURING_DEPLOYMENT      = "false"
@@ -291,6 +293,7 @@ resource "azurerm_linux_web_app" "app" {
   }
 
   depends_on = [
+    azurerm_role_assignment.search_documents,
     azurerm_role_assignment.key_vault_reader,
     azurerm_private_endpoint.sql,
     azurerm_private_endpoint.key_vault,

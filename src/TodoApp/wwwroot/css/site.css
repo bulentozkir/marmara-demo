@@ -92,6 +92,13 @@ p { color: var(--muted); }
 .section-heading .eyebrow { font-size: .6rem; margin-bottom: 9px; }
 .section-heading h2 { margin: 0; font-size: 1.4rem; }
 .count-pill { display: inline-grid; place-items: center; min-width: 32px; height: 30px; padding-inline: 9px; border-radius: 9px; background: #f0f3f9; color: #64718a; font-size: .8rem; font-weight: 700; }
+.todo-search { display: flex; gap: 9px; align-items: center; }
+.search-input { flex: 1; position: relative; min-width: 0; }
+.search-input > .icon { position: absolute; left: 12px; top: 14px; width: 18px; height: 18px; color: #8090af; pointer-events: none; }
+.search-input .form-control { padding-left: 38px; }
+.search-hint { font-size: .7rem; line-height: 1.65; margin: 11px 0 23px; }
+.status-warning { color: #775320; background: #fff8e9; border-color: #efdbac; }
+.search-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 15px; border-top: 1px solid var(--line); margin-top: 22px; padding-top: 20px; font-size: .8rem; color: var(--muted); }
 .todo-list { display: grid; gap: 11px; list-style: none; margin: 0; padding: 0; }
 .todo-item { display: flex; gap: 13px; align-items: center; padding: 14px; border: 1px solid #e6eaf2; border-radius: 13px; background: #fdfdff; transition: border-color .15s, box-shadow .15s; }
 .todo-item:hover { border-color: #ced8f0; box-shadow: 0 2px 8px #3659d90b; }
@@ -228,6 +235,8 @@ details > p { padding-bottom: 12px; margin: 0; font-size: .85rem; max-width: 850
   .workspace-hero h1 { font-size: 2rem; }
   .capture-panel, .list-panel, .auth-panel, .settings-panel { padding: 24px; }
   .section-heading .eyebrow { font-size: .54rem; }
+  .todo-search { flex-wrap: wrap; }
+  .todo-search .search-input { flex-basis: 100%; }
   .auth-panel h2 { font-size: 1.6rem; }
   .auth-story h1 { font-size: 2.1rem; }
   .auth-story > p { margin-bottom: 0; }

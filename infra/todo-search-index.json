@@ -1,0 +1,8 @@
+{
+  "name": "todos",
+  "fields": [
+    { "name": "id", "type": "Edm.String", "key": true, "searchable": false, "filterable": true, "retrievable": true },
+    { "name": "ownerId", "type": "Edm.String", "searchable": false, "filterable": true, "retrievable": false },
+    { "name": "description", "type": "Edm.String", "searchable": true, "filterable": false, "retrievable": true }
+  ]
+}
